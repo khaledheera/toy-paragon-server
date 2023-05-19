@@ -30,6 +30,10 @@ async function run() {
     await client.connect();
 
     const dollCollection = client.db('toyParagon').collection('dollCategory');
+   
+    const indexKeys = { name: 1, subCategory: 1 }; // Replace field1 and field2 with your actual field names
+    const indexOptions = { name: "dollCategory" }; // Replace index_name with the desired index name
+    const result = await dollCollection.createIndex(indexKeys, indexOptions);
     
 
     app.get('/category', async (req, res) => {
@@ -70,8 +74,18 @@ async function run() {
       res.send(result);
   })
 
-
-
+  app.get("/getToysByText/:text", async (req, res) => {
+    const text = req.params.text;
+    const result = await dollCollection
+      .find({
+        $or: [
+          { name: { $regex: text, $options: "i" } },
+          { subCategory: { $regex: text, $options: "i" } },
+        ],
+      })
+      .toArray();
+    res.send(result);
+  });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
