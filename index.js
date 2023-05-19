@@ -30,7 +30,7 @@ async function run() {
     await client.connect();
 
     const dollCollection = client.db('toyParagon').collection('dollCategory');
-    const addToy = client.db('toyParagon').collection('newToys');
+    
 
     app.get('/category', async (req, res) => {
         const dolls = dollCollection.find();
@@ -48,10 +48,20 @@ async function run() {
 
     app.post('/addToys',async(req,res)=>{
       const newToy=req.body
-      const newToys=await addToy.insertOne(newToy)
+      const newToys=await dollCollection.insertOne(newToy)
       res.send(newToys)
     })
+    app.get('/allToys',async(req,res)=>{
+      const toys=await dollCollection.find({}).toArray()
+      res.send(toys)
+    })
 
+
+    app.get("/myToys/:email", async (req, res) => {
+      console.log(req.params.email);
+      const dolls= await dollCollection.find({sellerEmail: req.params.email}).toArray();
+      res.send(dolls);
+    });
 
 
 
