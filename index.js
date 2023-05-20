@@ -31,8 +31,8 @@ async function run() {
 
     const dollCollection = client.db('toyParagon').collection('dollCategory');
    
-    const indexKeys = { name: 1, subCategory: 1 }; // Replace field1 and field2 with your actual field names
-    const indexOptions = { name: "dollCategory" }; // Replace index_name with the desired index name
+    const indexKeys = { name: 1, subCategory: 1 };
+    const indexOptions = { name: "dollCategory" }; 
     const result = await dollCollection.createIndex(indexKeys, indexOptions);
     
 
@@ -56,7 +56,10 @@ async function run() {
       res.send(newToys)
     })
     app.get('/allToys',async(req,res)=>{
-      const toys=await dollCollection.find({}).toArray()
+      const page = parseInt(req.query.page) || 0;
+      const limit = parseInt(req.query.limit) || 20;
+      const skip = page * limit;
+      const toys=await dollCollection.find({}).skip(skip).limit(limit).toArray()
       res.send(toys)
     })
 
@@ -86,6 +89,24 @@ async function run() {
       .toArray();
     res.send(result);
   });
+
+
+  app.put("/updateMyToys/:id", async (req, res) => {
+    const id = req.params.id;
+    const body = req.body;
+    console.log(body);
+    const filter = { _id: new ObjectId(id) };
+    const updateMyToys = {
+      $set: {
+        price: body.price,
+        quantity: body.quantity,
+        description: body.description,
+      },
+    };
+    const result = await dollCollection.updateOne(filter, updateMyToys);
+    res.send(result);
+  });
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
