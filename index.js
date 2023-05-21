@@ -27,13 +27,13 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const dollCollection = client.db('toyParagon').collection('dollCategory');
    
-    const indexKeys = { name: 1, subCategory: 1 };
-    const indexOptions = { name: "dollCategory" }; 
-    const result = await dollCollection.createIndex(indexKeys, indexOptions);
+    // const indexKeys = { name: 1, subCategory: 1 };
+    // const indexOptions = { name: "dollCategory" }; 
+    // const result = await dollCollection.createIndex(indexKeys, indexOptions);
     
 
     app.get('/category', async (req, res) => {
@@ -55,6 +55,7 @@ async function run() {
       const newToys=await dollCollection.insertOne(newToy)
       res.send(newToys)
     })
+
     app.get('/allToys',async(req,res)=>{
       const page = parseInt(req.query.page) || 0;
       const limit = parseInt(req.query.limit) || 20;
@@ -65,10 +66,27 @@ async function run() {
 
 
     app.get("/myToys/:email", async (req, res) => {
-      console.log(req.params.email);
+      // console.log(req.params.email);
       const dolls= await dollCollection.find({sellerEmail: req.params.email}).toArray();
       res.send(dolls);
     });
+
+  
+
+    app.get("/sort", async (req, res) => {
+      const user=req.query.user;
+      const sort=parseInt(req.query.sort);
+
+      // console.log(sort);
+      const dolls= await dollCollection.find({sellerEmail: user}).sort({price:sort}).toArray();
+      res.send(dolls);
+      // console.log(dolls);
+    });
+    
+
+    
+
+
 
     app.delete('/myToys/:id', async (req, res) => {
       const id = req.params.id;
