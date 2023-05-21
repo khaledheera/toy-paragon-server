@@ -90,7 +90,6 @@ async function run() {
     res.send(result);
   });
 
-
   app.put("/updateMyToys/:id", async (req, res) => {
     const id = req.params.id;
     const body = req.body;
@@ -106,6 +105,8 @@ async function run() {
     const result = await dollCollection.updateOne(filter, updateMyToys);
     res.send(result);
   });
+
+ 
 
 
     // Send a ping to confirm a successful connection
